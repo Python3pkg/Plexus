@@ -2,6 +2,8 @@
   <img src="https://raw.githubusercontent.com/mertyildiran/Plexus/master/docs/img/full.gif" alt="Plexus"/>
 </p>
 
+# [DISCONTINUED]
+
 ## Core Principles
 
 These are the core principles of **exceptionally bio-inspired**, a revolutionary approach to the artificial neural networks:
