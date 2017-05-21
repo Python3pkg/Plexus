@@ -33,7 +33,7 @@ class Neuron():
 
 	def calculate_potential(self):
 		total = 0
-		for neuron, weight in self.subscriptions.iteritems():
+		for neuron, weight in self.subscriptions.items():
 			total += neuron.potential * weight
 		return self.activation_function(total)
 
@@ -72,7 +72,7 @@ class Neuron():
 
 				alteration_value = (self.loss ** 4) / (len(self.subscriptions) + 1)
 
-				for neuron, weight in self.subscriptions.iteritems():
+				for neuron, weight in self.subscriptions.items():
 					neuron.desired_potential = neuron.potential + (alteration_value * alteration_sign)
 					self.subscriptions[neuron] = weight + (alteration_value * alteration_sign)
 					#self.blame_lock = self.network.wave_counter
@@ -82,17 +82,17 @@ class Network():
 
 	def __init__(self,size,input_dim=0,output_dim=0,connectivity=0.01,precision=2,randomly_fire=False,dynamic_output=False):
 		self.precision = precision
-		print "\nPrecision of the network will be " + str( 1.0 / (10**precision) )
+		print("\nPrecision of the network will be " + str( 1.0 / (10**precision) ))
 		self.connectivity = int(size * connectivity)
 		self.connectivity_sqrt = int(math.sqrt(self.connectivity))
 		self.connectivity_sqrt_sqrt = int(math.sqrt(self.connectivity_sqrt))
-		print "Each individual non-sensory neuron will subscribe to " + str(int(size * connectivity)) + " different neurons"
+		print("Each individual non-sensory neuron will subscribe to " + str(int(size * connectivity)) + " different neurons")
 
 		self.neurons = []
 		for i in range(size):
 			Neuron(self)
-		print "\n"
-		print str(size) + " neurons created"
+		print("\n")
+		print(str(size) + " neurons created")
 
 		self.sensory_neurons = []
 		self.input_dim = input_dim
@@ -122,31 +122,31 @@ class Network():
 		self.wave_counter = 0
 		self.batch_lock = 1
 
-		print "\n"
+		print("\n")
 
 		self.freezer = False
 		self.thread = None
 		self.ignite()
 
-		print ""
+		print("")
 
 	def initiate_subscriptions(self,only_new_ones=0):
-		print ""
+		print("")
 		for neuron in self.neurons:
 			if neuron.type == 1:
 				continue
 			if only_new_ones and len(neuron.subscriptions) != 0:
 				continue
 			neuron.partially_subscribe()
-			print "Initiated: " + str(self.initiated_neurons) + " neurons\r",
+			print("Initiated: " + str(self.initiated_neurons) + " neurons\r", end=' ')
 			sys.stdout.flush()
-		print "\n"
+		print("\n")
 
 	def add_neurons(self,units):
 		for i in range(units):
 			Neuron(self)
-		print "\n"
-		print str(units) + " neurons added"
+		print("\n")
+		print(str(units) + " neurons added")
 		self.initiate_subscriptions(1)
 
 	def _ignite(self):
@@ -164,7 +164,7 @@ class Network():
 				neuron.fire()
 				if motor_fire_counter >= len(self.motor_neurons):
 					if self.dynamic_output:
-						print "Output: " + str(self.get_output()) + "\r",
+						print("Output: " + str(self.get_output()) + "\r", end=' ')
 						sys.stdout.flush()
 					self.output = self.get_output()
 					self.wave_counter += 1
@@ -192,7 +192,7 @@ class Network():
 						neuron.ban_counter = 0
 					ban_list = []
 					if self.dynamic_output:
-						print "Output: " + str(self.get_output()) + "\r",
+						print("Output: " + str(self.get_output()) + "\r", end=' ')
 						sys.stdout.flush()
 					self.output = self.get_output()
 					self.wave_counter += 1
@@ -221,7 +221,7 @@ class Network():
 					if neuron.ban_counter > self.connectivity_sqrt:
 						current_queue.pop(neuron, None)
 				while current_queue:
-					neuron = random.choice(current_queue.keys())
+					neuron = random.choice(list(current_queue.keys()))
 					current_queue.pop(neuron, None)
 					if neuron.ban_counter <= self.connectivity_sqrt:
 						if neuron.type == 2:
@@ -236,17 +236,17 @@ class Network():
 		if not self.thread:
 			self.thread = threading.Thread(target=self._ignite)
 			self.thread.start()
-		print "Network has been ignited"
+		print("Network has been ignited")
 
 	def freeze(self):
 		self.freezer = True
 		self.thread = None
-		print "Network is now frozen"
+		print("Network is now frozen")
 
 	def breakit(self):
 		for neuron in self.neurons:
 			neuron.subscriptions = {}
-		print "All the subscriptions are now broken"
+		print("All the subscriptions are now broken")
 
 	def pick_sensory_neurons(self,input_dim):
 		available_neurons = []
@@ -256,7 +256,7 @@ class Network():
 		for neuron in random.sample(available_neurons,input_dim):
 			neuron.type = 1
 			self.sensory_neurons.append(neuron)
-		print str(input_dim) + " neuron picked as sensory neuron"
+		print(str(input_dim) + " neuron picked as sensory neuron")
 
 	def pick_motor_neurons(self,output_dim):
 		available_neurons = []
@@ -266,13 +266,13 @@ class Network():
 		for neuron in random.sample(available_neurons,output_dim):
 			neuron.type = 2
 			self.motor_neurons.append(neuron)
-		print str(output_dim) + " neuron picked as motor neuron"
+		print(str(output_dim) + " neuron picked as motor neuron")
 
 	def load(self,input_arr,output_arr=None):
 		if len(self.sensory_neurons) != len(input_arr):
-			print "Size of the input array: " + str(len(input_arr))
-			print "Number of the sensory neurons: " + str(len(self.sensory_neurons))
-			print "Size of the input array and number of the sensory neurons are not matching! Please try again"
+			print("Size of the input array: " + str(len(input_arr)))
+			print("Number of the sensory neurons: " + str(len(self.sensory_neurons)))
+			print("Size of the input array and number of the sensory neurons are not matching! Please try again")
 		else:
 			step = 0
 			for neuron in self.sensory_neurons:
@@ -286,9 +286,9 @@ class Network():
 				step += 1
 		else:
 			if len(self.motor_neurons) != len(output_arr):
-				print "Size of the output/target array: " + str(len(output_arr))
-				print "Number of the motor_neurons: " + str(len(self.motor_neurons))
-				print "Size of the output/target array and number of the motor neurons are not matching! Please try again"
+				print("Size of the output/target array: " + str(len(output_arr)))
+				print("Number of the motor_neurons: " + str(len(self.motor_neurons)))
+				print("Size of the output/target array and number of the motor neurons are not matching! Please try again")
 			else:
 				step = 0
 				for neuron in self.motor_neurons:
